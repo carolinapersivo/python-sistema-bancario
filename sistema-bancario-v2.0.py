@@ -45,27 +45,53 @@ def tirar_extrato(saldo,/,*, extrato):
     print("=" * 30)
         
 def criar_usuario(cpf, usuarios):
-        if cpf in usuarios:
+    for i in range(len(usuarios)):
+        if cpf in usuarios[i]["cpf"]:
             print("Usuário já existente")
-        else:
-            nome = input("Digite o nome do usuário: ")
-            data_nascimento = input("Digite a data de nascimento do usuário: ")
-            endereco = input("Digite o endereço do usuário: ")
-            usuarios.update({cpf:{"nome":nome, "data_nascimento": data_nascimento, "endereço": endereco}})
-            print(usuarios)
+            return
+    
+    nome = input("Digite o nome do usuário: ")
+    data_nascimento = input("Digite a data de nascimento do usuário: ")
+    endereco = input("Digite o endereço do usuário: ")
+    usuarios.append({"cpf":cpf,"nome":nome, "data_nascimento": data_nascimento, "endereço": endereco})
+    print("Usuário criado!")
 
-def criar_conta():
-    conta = {}
+def criar_conta(cpf, usuarios, contas, n_agencia, n_conta):
+    for i in range(len(usuarios)):
+        if not cpf in usuarios[i]["cpf"]:
+            print("Usuário não existente")
+            return contas, n_conta
+        else:
+            usuario = usuarios[i]["nome"]
+            
+    agencia = n_agencia
+    n_conta += 1
+    contas.append({"agencia": agencia,"n_conta":n_conta, "usuario": usuario, "cpf": cpf})
+    print("Conta criada!")
+    return contas, n_conta
+
+def listar_contas(contas):
+    for conta in contas:
+        print(conta)
+        agencia = conta["agencia"]
+        n_conta = conta["n_conta"]
+        usuario = conta["usuario"]
+
+        print(f"""
+        Agência: {agencia}
+        Nº da conta: {n_conta}
+        Usuário: {usuario}""")
 
 def main():    
     LIMITE_SAQUE_VALOR = 500
     LIMITE_SAQUE_QTD = 3
+    N_AGENCIA = "0001"
+    n_conta = 0
     num_saques = 0
     saldo = 0
-    movimentacoes = 0
     extrato = ""
-    usuarios = {}
-    conta = []
+    usuarios = []
+    contas = []
 
     while True:
         opcao = menu()
@@ -81,16 +107,18 @@ def main():
         elif opcao == 3:  #EXTRATO
             tirar_extrato(saldo, extrato = extrato)
 
-        elif opcao == 4:
+        elif opcao == 4: #CRIAR USUÁRIO
             cpf = input("Digite seu cpf: ")
             cpf = "".join(n for n in cpf if n.isdigit())
             criar_usuario(cpf, usuarios)
 
-        # elif opcao == 5:
-        #     listar_contas()
+        elif opcao == 5:
+            listar_contas(contas)
 
-        # elif opcao == 6:
-        #     criar_conta()
+        elif opcao == 6: #CRIAR CONTA
+            cpf = input("Digite o cpf do usuário: ")
+            cpf = "".join(n for n in cpf if n.isdigit())
+            contas, n_conta = criar_conta(cpf, usuarios, contas, N_AGENCIA, n_conta)
 
         elif opcao == 0:
             print("Obrigado por utilizar nossos serviços bancários")
